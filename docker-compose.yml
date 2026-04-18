@@ -13,11 +13,11 @@ services:
     restart: unless-stopped
     devices:
       - /dev/snd:/dev/snd           # passes your Pi's sound hardware in
-      - /proc/asound:/proc/asound   # gives Docker container access to the same sound devices
     group_add:
       - audio                       # gives container permission to use it
     volumes:
       - ./audio:/app/audio          # mount folder for test MP3s etc
+      - /proc/asound:/proc/asound   # gives Docker container access to the same sound devices
     environment:
       - VOSK_IP=vosk-server         # use service name, not 127.0.0.1
       - WAKE_IP=openwakeword
