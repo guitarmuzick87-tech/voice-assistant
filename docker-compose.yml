@@ -50,4 +50,4 @@ services:
       - "--uri"
       - "tcp://0.0.0.0:10400"
       - "--preload-model"
-      - "ok_nabu"
+      - "hey_jarvis"
