@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+
+  voice-assistant:
+    build: .                        # builds from your Dockerfile
+    container_name: voice-assistant
+    restart: unless-stopped
+    devices:
+      - /dev/snd:/dev/snd           # passes your Pi's sound hardware in
+    group_add:
+      - audio                       # gives container permission to use it
+    volumes:
+      - ./audio:/app/audio          # mount folder for test MP3s etc
+    environment:
+      - VOSK_IP=vosk-server         # use service name, not 127.0.0.1
+      - WAKE_IP=openwakeword
+    depends_on:
+      - vosk-server
+      - openwakeword
+    network_mode: host              # simplest for audio on Pi
+
+  vosk-server:
+    image: rhasspy/wyoming-vosk:latest
+    container_name: vosk-server
+    restart: unless-stopped
+    ports:
+      - "10300:10300"
+    volumes:
+      - ./vosk-data:/data
+    command:
+      - "--data-dir"
+      - "/data"
+      - "--language"
+      - "en"
+      - "--uri"
+      - "tcp://0.0.0.0:10300"
+      - "--debug"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  openwakeword:
+    image: rhasspy/wyoming-openwakeword:latest
+    container_name: openwakeword
+    restart: unless-stopped
+    ports:
+      - "10400:10400"
+    command:
+      - "--uri"
+      - "tcp://0.0.0.0:10400"
+      - "--preload-model"
+      - "ok_nabu"
