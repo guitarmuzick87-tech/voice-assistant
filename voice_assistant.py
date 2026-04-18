@@ -27,7 +27,7 @@ CHUNK_BYTES = 3200  # 100ms of audio per read
 # Set this to your USB mic's device index.
 # Run `python -c "import pyaudio; p=pyaudio.PyAudio(); [print(i, p.get_device_info_by_index(i)['name']) for i in range(p.get_device_count())]"`
 # to list devices and find your USB mic.
-MIC_DEVICE_INDEX = None  # None = system default
+MIC_DEVICE_INDEX = 2  # None = system default
 
 # Silence detection — stops recording after this many seconds of quiet
 SILENCE_TIMEOUT = 2.0
