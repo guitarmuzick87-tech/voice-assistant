@@ -5,6 +5,8 @@ import os
 import time
 import wave
 import struct
+import sys
+sys.stdout.reconfigure(line_buffering=True)
 from wyoming.asr import Transcribe
 from wyoming.audio import AudioStart, AudioChunk, AudioStop
 from wyoming.event import async_read_event, async_write_event

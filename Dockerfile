@@ -18,4 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY voice_assistant.py .
 COPY asound.conf /etc/asound.conf
 
-CMD ["python", "voice_assistant.py"]
+CMD ["python", "-u", "voice_assistant.py"]
