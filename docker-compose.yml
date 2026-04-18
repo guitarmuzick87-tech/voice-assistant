@@ -1,4 +1,10 @@
 version: '3.8'
+
+
+networks:
+  voice-net:
+    driver: bridge
+
 services:
 
   voice-assistant:
@@ -16,8 +22,9 @@ services:
       - WAKE_IP=openwakeword
     depends_on:
       - vosk-server
-      - openwakeword
-    network_mode: host              # simplest for audio on Pi
+      - openwakeword              # simplest for audio on Pi
+    networks:
+      - voice-net
 
   vosk-server:
     image: rhasspy/wyoming-vosk:latest
@@ -39,6 +46,8 @@ services:
       resources:
         limits:
           memory: 1G
+    networks:
+      - voice-net
 
   openwakeword:
     image: rhasspy/wyoming-openwakeword:latest
@@ -51,3 +60,5 @@ services:
       - "tcp://0.0.0.0:10400"
       - "--preload-model"
       - "hey_jarvis"
+    networks:
+      - voice-net
