@@ -13,6 +13,7 @@ services:
     restart: unless-stopped
     devices:
       - /dev/snd:/dev/snd           # passes your Pi's sound hardware in
+      - /proc/asound:/proc/asound   # gives Docker container access to the same sound devices
     group_add:
       - audio                       # gives container permission to use it
     volumes:
