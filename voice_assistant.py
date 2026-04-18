@@ -16,9 +16,9 @@ from wyoming.event import async_read_event, async_write_event
 # ─────────────────────────────────────────────
 # CONFIG — edit these when your hardware arrives
 # ─────────────────────────────────────────────
-VOSK_IP = "127.0.0.1"
+VOSK_IP = os.environ.get("VOSK_IP", "127.0.0.1")
 VOSK_PORT = 10300
-WAKE_IP = "127.0.0.1"
+WAKE_IP = os.environ.get("WAKE_IP", "127.0.0.1")
 WAKE_PORT = 10400
 
 SAMPLE_RATE = 16000
