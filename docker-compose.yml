@@ -44,3 +44,23 @@ services:
       - "hey_jarvis"
     networks:
       - voice-net
+
+  piper:
+    image: rhasspy/wyoming-piper:latest
+    container_name: piper
+    restart: unless-stopped
+    ports:
+      - "10200:10200"
+    volumes:
+      - ./piper-data:/data
+    command:
+      - "--uri"
+      - "tcp://0.0.0.0:10200"
+      - "--voice"
+      - "en_US-bryce-medium"
+      - "--data-dir"
+      - "/data"
+      - "--download-dir"
+      - "/data"
+    networks:
+      - voice-net
