@@ -16,9 +16,9 @@ from wyoming.event import async_read_event, async_write_event
 # ─────────────────────────────────────────────
 # CONFIG — edit these when your hardware arrives
 # ─────────────────────────────────────────────
-VOSK_IP = os.environ.get("VOSK_IP", "127.0.0.1")
+VOSK_IP = "127.0.0.1"
 VOSK_PORT = 10300
-WAKE_IP = os.environ.get("WAKE_IP", "127.0.0.1")
+WAKE_IP = "127.0.0.1"
 WAKE_PORT = 10400
 
 SAMPLE_RATE = 16000
@@ -29,7 +29,7 @@ CHUNK_BYTES = 3200  # 100ms of audio per read
 # Set this to your USB mic's device index.
 # Run `python -c "import pyaudio; p=pyaudio.PyAudio(); [print(i, p.get_device_info_by_index(i)['name']) for i in range(p.get_device_count())]"`
 # to list devices and find your USB mic.
-MIC_DEVICE_INDEX = 2  # None = system default
+MIC_DEVICE_INDEX = 1  # None = system default
 
 # Silence detection — stops recording after this many seconds of quiet
 SILENCE_TIMEOUT = 2.0

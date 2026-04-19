@@ -7,26 +7,6 @@ networks:
 
 services:
 
-  voice-assistant:
-    build: .                        # builds from your Dockerfile
-    container_name: voice-assistant
-    restart: unless-stopped
-    devices:
-      - /dev/snd:/dev/snd           # passes your Pi's sound hardware in
-    group_add:
-      - audio                       # gives container permission to use it
-    volumes:
-      - ./audio:/app/audio          # mount folder for test MP3s etc
-      - /proc/asound:/proc/asound   # gives Docker container access to the same sound devices
-    environment:
-      - VOSK_IP=vosk-server         # use service name, not 127.0.0.1
-      - WAKE_IP=openwakeword
-    depends_on:
-      - vosk-server
-      - openwakeword              # simplest for audio on Pi
-    networks:
-      - voice-net
-
   vosk-server:
     image: rhasspy/wyoming-vosk:latest
     container_name: vosk-server
@@ -59,7 +39,7 @@ services:
     command:
       - "--uri"
       - "tcp://0.0.0.0:10400"
-      - "--preload-model"
+      - "--model"
       - "hey_jarvis"
     networks:
       - voice-net
