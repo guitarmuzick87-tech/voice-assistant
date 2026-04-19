@@ -74,7 +74,8 @@ def play_beep():
                 format=p.get_format_from_width(wf.getsampwidth()),
                 channels=wf.getnchannels(),
                 rate=wf.getframerate(),
-                output=True
+                output=True,
+                output_device_index=2  # ? USB PnP Audio Device
             )
             data = wf.readframes(1024)
             while data:
@@ -90,12 +91,10 @@ def play_beep():
 # ─────────────────────────────────────────────
 # WAKE WORD DETECTION
 # ─────────────────────────────────────────────
+from wyoming.wake import Detect, Detection
+
 async def wait_for_wake_word(mic_stream, loop):
-    """
-    Stream mic audio to OpenWakeWord continuously.
-    Returns when the wake word is detected.
-    """
-    print("👂 Listening for wake word...")
+    print("? Listening for wake word...")
 
     while True:
         try:
@@ -106,6 +105,7 @@ async def wait_for_wake_word(mic_stream, loop):
             continue
 
         try:
+            await async_write_event(Detect(names=["hey_jarvis"]).event(), writer)  # ? fix
             await async_write_event(
                 AudioStart(rate=SAMPLE_RATE, width=WIDTH, channels=CHANNELS).event(),
                 writer
@@ -128,10 +128,9 @@ async def wait_for_wake_word(mic_stream, loop):
                         return False
                     if event.type == "detection":
                         name = event.data.get("name", "unknown")
-                        print(f"\n🎯 Wake word detected: '{name}'")
+                        print(f"\n? Wake word detected: '{name}'")
                         return True
 
-            # Race: keep sending mic audio until wake word fires
             send_task = asyncio.create_task(send_mic_to_wake())
             detected = await wait_for_detection()
             send_task.cancel()
@@ -144,7 +143,6 @@ async def wait_for_wake_word(mic_stream, loop):
         finally:
             writer.close()
             await writer.wait_closed()
-
 
 # ─────────────────────────────────────────────
 # COMMAND RECORDING

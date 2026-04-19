@@ -31,8 +31,10 @@ async def test():
     reader, writer = await asyncio.open_connection(WAKE_IP, WAKE_PORT)
     print("Connected. Sending AudioStart...")
     print("Connected. Sending Detect + AudioStart...")
-    await async_write_event(Detect().event(), writer)  # ← add this
-
+    await async_write_event(
+        Detect(names=["hey_jarvis"]).event(),  # ← specify model name
+        writer
+    )
     await async_write_event(
         AudioStart(rate=SAMPLE_RATE, width=WIDTH, channels=CHANNELS).event(),
         writer
