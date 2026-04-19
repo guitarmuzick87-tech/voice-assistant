@@ -55,3 +55,24 @@ async def wait_for_wake_word(mic_stream, loop):
         finally:
             writer.close()
             await writer.wait_closed()
+
+
+async def listen_for_interrupt(mic_stream, loop) -> bool:
+    """Listen for a single chunk and check for interrupt word via Vosk."""
+    from transcribe import transcribe_audio
+    from config import INTERRUPT_WORD, SAMPLE_RATE, CHANNELS, WIDTH, CHUNK_BYTES
+
+    # Record 1 second of audio
+    audio = b""
+    for _ in range(10):  # 10 x 100ms = 1 second
+        chunk = await loop.run_in_executor(
+            None, mic_stream.read, CHUNK_BYTES // WIDTH, False
+        )
+        from audio import to_mono_16k
+        audio += to_mono_16k(chunk, src_rate=SAMPLE_RATE, src_channels=CHANNELS)
+
+    transcript = await transcribe_audio(audio)
+    if transcript:
+        print(f"[Interrupt check] heard: '{transcript}'")
+        return INTERRUPT_WORD.lower() in transcript.lower()
+    return False

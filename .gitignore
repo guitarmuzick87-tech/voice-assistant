@@ -1,6 +1,7 @@
 #Piper downloaded voice files
 piper-data/
 vosk-data/
+.env 
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

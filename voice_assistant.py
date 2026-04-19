@@ -6,7 +6,7 @@ from config import (
     DEBUG_SKIP_WAKE_WORD, DEBUG_SKIP_RECORDING,
     DEBUG_SKIP_LLM, DEBUG_SKIP_TTS,
     DEBUG_FAKE_TRANSCRIPT, DEBUG_FAKE_RESPONSE,
-    LLM_PROVIDER, LLM_MODEL
+    LLM_PROVIDER, LLM_MODEL, WAKE_RESPONSE, INTERRUPT_RESPONSE
 )
 from audio import open_mic
 from wake import wait_for_wake_word
@@ -41,9 +41,8 @@ async def main():
             else:
                 await wait_for_wake_word(mic_stream, loop)
 
-            # 2. Beep
-            # 2. Confirmation — speak instead of beep
-            await speak("Yes, I'm listening.")
+            # 2. Wake confirmation
+            await speak(WAKE_RESPONSE, mic_stream=mic_stream, loop=loop)
 
             # 3. Record
             if DEBUG_SKIP_RECORDING:
@@ -56,7 +55,7 @@ async def main():
 
             if not transcript:
                 print("⚠️  Couldn't transcribe command.")
-                await speak("Sorry, I didn't catch that. Please try again.")
+                await speak("Sorry, I didn't catch that. Please try again.", mic_stream=mic_stream, loop=loop)
                 continue
 
             print(f"\n📝 Command: \"{transcript}\"")
@@ -70,19 +69,23 @@ async def main():
                 response = await loop.run_in_executor(None, query_llm, transcript)
                 print(f"🤖 Response: \"{response[:100]}{'...' if len(response) > 100 else ''}\"")
 
-            # 5. TTS
+            # 5. TTS — with interrupt detection
             if DEBUG_SKIP_TTS:
                 print(f"⚡ [DEBUG] TTS skipped. Full response:\n{response}")
             else:
-                await speak(response)
+                interrupted = await speak(response, mic_stream=mic_stream, loop=loop)
+                if interrupted:
+                    print("⚡ Response interrupted by user.")
+                    await speak(INTERRUPT_RESPONSE, mic_stream=mic_stream, loop=loop)
 
             print()
 
     except KeyboardInterrupt:
         print("\n\n👋 Shutting down.")
     finally:
-        mic_stream.stop_stream()
-        mic_stream.close()
+        if mic_stream:
+            mic_stream.stop_stream()
+            mic_stream.close()
         p.terminate()
 
 

@@ -22,7 +22,9 @@ services:
       - "en"
       - "--uri"
       - "tcp://0.0.0.0:10300"
-      - "--debug"
+      - "--model-for-language"
+      - "en"
+      - "vosk-model-en-us-0.22-lgraph"
     deploy:
       resources:
         limits:

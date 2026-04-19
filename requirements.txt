@@ -2,3 +2,4 @@ audioop-lts
 pyaudio==0.2.14
 numpy==2.4.4
 wyoming==1.8.0
+dotenv
