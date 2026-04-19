@@ -8,7 +8,7 @@ from config import (
     DEBUG_FAKE_TRANSCRIPT, DEBUG_FAKE_RESPONSE,
     LLM_PROVIDER, LLM_MODEL
 )
-from audio import ensure_beep, play_beep, open_mic
+from audio import open_mic
 from wake import wait_for_wake_word
 from transcribe import record_command, transcribe_audio
 from llm import query_llm
@@ -16,7 +16,6 @@ from tts import speak
 
 
 async def main():
-    ensure_beep()
     loop = asyncio.get_event_loop()
     p, mic_stream = open_mic()
 
