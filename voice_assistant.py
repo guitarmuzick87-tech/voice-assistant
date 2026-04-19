@@ -6,6 +6,7 @@ import time
 import wave
 import struct
 import sys
+import audioop
 sys.stdout.reconfigure(line_buffering=True)
 from wyoming.asr import Transcribe
 from wyoming.audio import AudioStart, AudioChunk, AudioStop
@@ -21,7 +22,7 @@ VOSK_PORT = 10300
 WAKE_IP = "127.0.0.1"
 WAKE_PORT = 10400
 
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 44100 # USB Mic Native Rate
 CHANNELS = 1
 WIDTH = 2           # 16-bit
 CHUNK_BYTES = 3200  # 100ms of audio per read
@@ -29,7 +30,7 @@ CHUNK_BYTES = 3200  # 100ms of audio per read
 # Set this to your USB mic's device index.
 # Run `python -c "import pyaudio; p=pyaudio.PyAudio(); [print(i, p.get_device_info_by_index(i)['name']) for i in range(p.get_device_count())]"`
 # to list devices and find your USB mic.
-MIC_DEVICE_INDEX = 1  # None = system default
+MIC_DEVICE_INDEX = 2  # None = system default
 
 # Silence detection — stops recording after this many seconds of quiet
 SILENCE_TIMEOUT = 2.0
@@ -88,6 +89,14 @@ def play_beep():
         print(f"[Beep Error]: {e}")
 
 
+def to_mono_16k(data, src_rate=44100, src_channels=CHANNELS):
+    # Convert stereo to mono
+    if src_channels == 2:
+        data = audioop.tomono(data, 2, 0.5, 0.5)
+    # Resample to 16kHz
+    data, _ = audioop.ratecv(data, 2, 1, src_rate, 16000, None)
+    return data
+
 # ─────────────────────────────────────────────
 # WAKE WORD DETECTION
 # ─────────────────────────────────────────────
@@ -116,8 +125,9 @@ async def wait_for_wake_word(mic_stream, loop):
                     chunk = await loop.run_in_executor(
                         None, mic_stream.read, CHUNK_BYTES // WIDTH, False
                     )
+                    chunk = to_mono_16k(chunk, src_rate=SAMPLE_RATE, src_channels=CHANNELS)  # ? src_channels=1
                     await async_write_event(
-                        AudioChunk(rate=SAMPLE_RATE, width=WIDTH, channels=CHANNELS, audio=chunk).event(),
+                        AudioChunk(rate=16000, width=WIDTH, channels=CHANNELS, audio=chunk).event(),  # ? 16000, channels=1
                         writer
                     )
 

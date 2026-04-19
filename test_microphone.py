@@ -1,8 +1,8 @@
 import pyaudio
 import time
 
-MIC_DEVICE_INDEX = 1
-SAMPLE_RATE = 16000
+MIC_DEVICE_INDEX = 2
+SAMPLE_RATE = 44100
 CHUNK = 1600
 
 p = pyaudio.PyAudio()
